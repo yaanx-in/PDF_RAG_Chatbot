@@ -14,7 +14,7 @@ from sentence_transformers import SentenceTransformer
 
 EMBED_MODEL = "all-MiniLM-L6-v2"      # free, offline (~80 MB, downloaded once)
 LLM_MODEL = "llama3.2:3b"               # local model served via Ollama (optional)
-GEMINI_MODEL = "gemini-2.0-flash"       # free hosted LLM (used on cloud deploys)
+GEMINI_MODEL = "gemini-flash-latest"    # -latest alias: auto-tracks current flash, survives model retirements
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai/"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
