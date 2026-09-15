@@ -14,7 +14,8 @@ from sentence_transformers import SentenceTransformer
 
 EMBED_MODEL = "all-MiniLM-L6-v2"      # free, offline (~80 MB, downloaded once)
 LLM_MODEL = "llama3.2:3b"               # local model served via Ollama (optional)
-GROQ_MODEL = "llama-3.1-8b-instant"     # free hosted LLM (used on cloud deploys)
+GEMINI_MODEL = "gemini-2.0-flash"       # free hosted LLM (used on cloud deploys)
+GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai/"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
 TOP_K = 4
@@ -84,21 +85,21 @@ Question: {question}
 Answer:"""
 
 
-def _groq_answer(prompt):
-    """Free hosted LLM (Groq). Returns None if no key is configured."""
+def _gemini_answer(prompt):
+    """Free hosted LLM (Google Gemini). Returns None if no key is configured."""
     import os
     key = None
     try:
-        key = st.secrets.get("GROQ_API_KEY")     # cloud: set in app Secrets
+        key = st.secrets.get("GEMINI_API_KEY")    # cloud: set in app Secrets
     except Exception:
         pass
-    key = key or os.environ.get("GROQ_API_KEY")   # local: export the env var
+    key = key or os.environ.get("GEMINI_API_KEY")  # local: export the env var
     if not key:
         return None
     from openai import OpenAI
-    client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=key)
+    client = OpenAI(base_url=GEMINI_BASE, api_key=key)
     resp = client.chat.completions.create(
-        model=GROQ_MODEL, temperature=0.2,
+        model=GEMINI_MODEL, temperature=0.2,
         messages=[{"role": "user", "content": prompt}])
     return resp.choices[0].message.content
 
@@ -119,7 +120,7 @@ def generate_answer(question, hits):
         return REFUSAL
     ctx = "\n\n".join(f'[p.{c["page"]}] {c["text"]}' for c in hits)
     prompt = PROMPT.format(refusal=REFUSAL, context=ctx, question=question)
-    for backend in (_groq_answer, _ollama_answer):   # Groq -> Ollama -> extractive
+    for backend in (_gemini_answer, _ollama_answer):  # Gemini -> Ollama -> extractive
         try:
             ans = backend(prompt)
         except Exception:
@@ -127,7 +128,7 @@ def generate_answer(question, hits):
         if ans:
             return ans
     # ponytail: no LLM at all -> extractive fallback so the app still runs
-    # end to end. Set GROQ_API_KEY (cloud) or run Ollama (local) for phrased answers.
+    # end to end. Set GEMINI_API_KEY (cloud) or run Ollama (local) for phrased answers.
     top = hits[0]
     return (f"(No LLM configured — showing the most relevant passage.)\n\n"
             f'{top["text"]}\n\n(from p.{top["page"]})')
