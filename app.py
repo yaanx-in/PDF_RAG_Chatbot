@@ -138,34 +138,6 @@ def generate_answer(question, hits):
 st.set_page_config(page_title="PDF Doubt-Solving Chatbot (RAG)", page_icon="📄")
 st.title("PDF Doubt-Solving Chatbot (RAG)")
 
-# --- TEMP LLM diagnostics (delete once confirmed working) ---
-with st.sidebar:
-    st.caption("LLM status")
-    import os as _os
-    _k = None
-    try:
-        _k = st.secrets.get("GEMINI_API_KEY")
-    except Exception as _e:
-        st.error(f"secrets read failed: {type(_e).__name__}: {_e}")
-    _k = _k or _os.environ.get("GEMINI_API_KEY")
-    if not _k:
-        st.warning("No GEMINI_API_KEY in secrets/env")
-        print("[LLM-DIAG] NO KEY FOUND in st.secrets or env", flush=True)
-    else:
-        _masked = f"{_k[:6]}…{_k[-4:]}"
-        st.write(f"key found: len={len(_k)}, {_masked}")
-        print(f"[LLM-DIAG] key found: len={len(_k)} value={_masked}", flush=True)
-        try:
-            from openai import OpenAI as _OAI
-            _r = _OAI(base_url=GEMINI_BASE, api_key=_k).chat.completions.create(
-                model=GEMINI_MODEL, messages=[{"role": "user", "content": "ping"}])
-            _out = _r.choices[0].message.content
-            st.success(f"LLM OK ({GEMINI_MODEL}): {_out!r}")
-            print(f"[LLM-DIAG] LLM OK ({GEMINI_MODEL}): {_out!r}", flush=True)
-        except Exception as _e:
-            st.error(f"LLM call failed: {type(_e).__name__}: {str(_e)[:300]}")
-            print(f"[LLM-DIAG] LLM FAILED: {type(_e).__name__}: {str(_e)[:500]}", flush=True)
-
 pdf = st.file_uploader("Upload your PDF", type="pdf")
 
 if pdf and st.session_state.get("pdf_name") != pdf.name:
