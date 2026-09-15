@@ -1,0 +1,7 @@
+streamlit>=1.30
+pypdf>=4.0
+sentence-transformers>=2.2
+faiss-cpu>=1.7
+numpy>=1.24
+openai>=1.0        # used for the free Groq hosted LLM (cloud deploys)
+ollama>=0.1        # optional: local LLM backend for offline use
