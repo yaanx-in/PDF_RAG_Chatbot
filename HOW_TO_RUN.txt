@@ -1,0 +1,63 @@
+========================================================
+  PDF Chatbot - How to run it on a Windows laptop
+========================================================
+
+You do NOT need to know any coding. Just follow these steps.
+
+
+STEP 1 - Download the setup file
+--------------------------------
+Open this link in your web browser (Chrome/Edge):
+
+  https://raw.githubusercontent.com/yaanx-in/PDF_RAG_Chatbot/main/setup_windows.bat
+
+Press  Ctrl + S  to save it.
+Save it to your DESKTOP.
+Make sure the name stays exactly:  setup_windows.bat
+(If it tries to save as a ".txt" file, change "Save as type" to
+ "All files" and keep the name setup_windows.bat)
+
+
+STEP 2 - Run it
+---------------
+Double-click  setup_windows.bat  on your Desktop.
+
+If a blue box says "Windows protected your PC":
+   -> click "More info"
+   -> click "Run anyway"
+
+A black window opens and starts doing everything by itself:
+installing what it needs, downloading the app, and setting it up.
+The first time takes about 5-15 minutes. Just leave it running.
+
+
+STEP 3 - Paste the key (when it asks)
+-------------------------------------
+At some point it will say:  "Groq API key:"
+Paste the key you were given, then press Enter.
+(No key? Just press Enter - the app still works with basic answers.)
+
+
+STEP 4 - Use the app
+--------------------
+Your web browser opens automatically at:
+
+  http://localhost:8501
+
+Upload a PDF, then type your question. That's it!
+
+IMPORTANT: keep the black window OPEN while you use the app.
+Closing the black window stops the app.
+
+
+To use it again later
+---------------------
+Just double-click  setup_windows.bat  again.
+It skips everything already installed and opens the app fast.
+(It also grabs the newest version automatically.)
+
+
+Something went wrong?
+---------------------
+Take a photo/screenshot of the black window showing the error
+and send it back - it can be fixed quickly.
