@@ -16,6 +16,8 @@ EMBED_MODEL = "all-MiniLM-L6-v2"      # free, offline (~80 MB, downloaded once)
 LLM_MODEL = "llama3.2:3b"               # local model served via Ollama (optional)
 GEMINI_MODEL = "gemini-flash-latest"    # -latest alias: auto-tracks current flash, survives model retirements
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai/"
+GROQ_MODEL = "openai/gpt-oss-120b"      # free hosted open-weights LLM (Groq)
+GROQ_BASE = "https://api.groq.com/openai/v1"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
 TOP_K = 4
@@ -104,6 +106,25 @@ def _gemini_answer(prompt):
     return resp.choices[0].message.content
 
 
+def _groq_answer(prompt):
+    """Free hosted open-weights LLM (Groq). Returns None if no key is configured."""
+    import os
+    key = None
+    try:
+        key = st.secrets.get("GROQ_API_KEY")      # cloud: set in app Secrets
+    except Exception:
+        pass
+    key = key or os.environ.get("GROQ_API_KEY")   # local: export the env var
+    if not key:
+        return None
+    from openai import OpenAI
+    client = OpenAI(base_url=GROQ_BASE, api_key=key)
+    resp = client.chat.completions.create(
+        model=GROQ_MODEL, temperature=0.2,
+        messages=[{"role": "user", "content": prompt}])
+    return resp.choices[0].message.content
+
+
 def _ollama_answer(prompt):
     """Local LLM via Ollama. Returns None if not available."""
     try:
@@ -120,7 +141,7 @@ def generate_answer(question, hits):
         return REFUSAL
     ctx = "\n\n".join(f'[p.{c["page"]}] {c["text"]}' for c in hits)
     prompt = PROMPT.format(refusal=REFUSAL, context=ctx, question=question)
-    for backend in (_gemini_answer, _ollama_answer):  # Gemini -> Ollama -> extractive
+    for backend in (_groq_answer, _gemini_answer, _ollama_answer):  # Groq -> Gemini -> Ollama -> extractive
         try:
             ans = backend(prompt)
         except Exception:
